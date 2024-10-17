@@ -12,14 +12,15 @@ import CompoundInterestScreen from './src/screens/compound-interest-screen';
 import AmortizationScreen from './src/screens/amortization-screen';
 import UVRScreen from './src/screens/uvr-screen';
 import IRRScreen from './src/screens/tir-screen';
-import LoginScreen from './src/screens/login';
-import { auth } from './firebase'; // Asegúrate de tener el archivo firebase configurado correctamente
+import LoginScreen from './src/screens/login-screen';
+import RegisterScreen from './src/screens/Register-Screen';
+import RecoverScreen from './src/screens/RecoverPassword-screen';
+import { auth } from './firebase';
 
 const Stack = createNativeStackNavigator();
 
-// Contenido principal de la aplicación (después de iniciar sesión)
 function AppContent() {
-  const { isDarkMode } = useTheme(); // tema oscuro
+  const { isDarkMode } = useTheme();
   let [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_600SemiBold,
@@ -46,100 +47,41 @@ function AppContent() {
         headerTitleAlign: 'center',
       }}
     >
-      <Stack.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{
-          title: 'Calculadora de intereses',
-        }}
-      />
-      <Stack.Screen 
-        name="SimpleInterest" 
-        component={SimpleInterestScreen}
-        options={{
-          title: 'Interés Simple',
-        }}
-      />
-      <Stack.Screen 
-        name="CompoundInterest" 
-        component={CompoundInterestScreen}
-        options={{
-          title: 'Interés Compuesto',
-        }}
-      />
-      <Stack.Screen 
-        name="Annuities" 
-        component={AnnuitiesScreen}
-        options={{
-          title: 'Anualidades',
-        }}
-      />
-      <Stack.Screen 
-        name="Gradient" 
-        component={GradientScreen}
-        options={{
-          title: 'Gradientes',
-        }}
-      />
-      <Stack.Screen 
-        name="Amortization" 
-        component={AmortizationScreen}
-        options={{
-          title: 'Amortizacion',
-        }}
-      />
-      <Stack.Screen 
-        name="UVR" 
-        component={UVRScreen}
-        options={{
-          title: 'UVR',
-        }}
-      />
-      <Stack.Screen 
-        name="TIR" 
-        component={IRRScreen}
-        options={{
-          title: 'TIR',
-        }}
-      />
+      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Calculadora de intereses' }} />
+      <Stack.Screen name="SimpleInterest" component={SimpleInterestScreen} options={{ title: 'Interés Simple' }} />
+      <Stack.Screen name="CompoundInterest" component={CompoundInterestScreen} options={{ title: 'Interés Compuesto' }} />
+      <Stack.Screen name="Annuities" component={AnnuitiesScreen} options={{ title: 'Anualidades' }} />
+      <Stack.Screen name="Gradient" component={GradientScreen} options={{ title: 'Gradientes' }} />
+      <Stack.Screen name="Amortization" component={AmortizationScreen} options={{ title: 'Amortización' }} />
+      <Stack.Screen name="UVR" component={UVRScreen} options={{ title: 'UVR' }} />
+      <Stack.Screen name="TIR" component={IRRScreen} options={{ title: 'TIR' }} />
     </Stack.Navigator>
   );
 }
 
-// Componente principal de la aplicación que maneja la autenticación
 export default function App() {
-  const [user, setUser] = useState(null); // Estado para guardar la sesión del usuario
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Verificar el estado de autenticación de Firebase
     const unsubscribe = auth.onAuthStateChanged((authenticatedUser) => {
-      if (authenticatedUser) {
-        setUser(authenticatedUser); // Usuario autenticado
-      } else {
-        setUser(null); // Usuario no autenticado
-      }
+      setUser(authenticatedUser);
     });
 
-    return unsubscribe; // Limpiar la suscripción al desmontar el componente
+    return unsubscribe;
   }, []);
 
   return (
     <ThemeProvider>
       <NavigationContainer>
         <Stack.Navigator>
-          {/* Si hay usuario, muestra el contenido de la app, sino, muestra la pantalla de login */}
           {user ? (
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="AppContent"
-              component={AppContent}
-            />
+            <Stack.Screen options={{ headerShown: false }} name="AppContent" component={AppContent} />
           ) : (
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="Login"
-              component={LoginScreen}
-            />
+            <>
+              <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
+              <Stack.Screen options={{ headerShown: false }} name="Register" component={RegisterScreen} />
+              <Stack.Screen options={{ headerShown: false }} name="Recover" component={RecoverScreen} />
+            </>
           )}
         </Stack.Navigator>
       </NavigationContainer>

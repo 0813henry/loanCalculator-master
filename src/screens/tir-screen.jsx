@@ -3,6 +3,23 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'reac
 import { useTheme } from '../context/theme-context';
 import { calculateResults } from '../utils/tir';
 
+// Función para darle formato a los números con separador de miles y decimales
+const formatNumber = (number) => {
+  if (!number) return '';
+  
+  // Convertimos el número en string con dos decimales
+  const formattedNumber = parseFloat(number).toFixed(2);
+
+  // Separamos la parte entera y decimal
+  const [integerPart, decimalPart] = formattedNumber.split('.');
+
+  // Formateamos la parte entera con separador de miles
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  // Retornamos el número con coma como separador decimal
+  return `${formattedInteger},${decimalPart}`;
+};
+
 export default function IRRScreen() {
   const { isDarkMode } = useTheme();
   const [investment, setInvestment] = useState('');
@@ -55,7 +72,7 @@ export default function IRRScreen() {
         </Text>
         
         {renderInput('Inversión', investment, setInvestment)}
-        {renderInput('Tasa de intéres (%)', interest, setInterest)}
+        {renderInput('Tasa de interés (%)', interest, setInterest)}
 
         <Text className={`mb-2 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>Flujo de caja</Text>
         {cashFlows.map((cf, index) => (
@@ -94,8 +111,8 @@ export default function IRRScreen() {
         {results && (
           <View className="mt-4 p-4 rounded-md bg-gray-200">
             <Text className="text-lg font-bold mb-2">Resultados:</Text>
-            <Text>VAN: ${results.van}</Text>
-            <Text>TIR: {results.irr}%</Text>
+            <Text>VAN: ${formatNumber(results.van)}</Text>
+            <Text>TIR: {formatNumber(results.irr)}%</Text>
             <Text className={results.isRentable ? 'text-green-600' : 'text-red-600'}>
               {results.isRentable ? 'Es rentable' : 'No es rentable'}
             </Text>

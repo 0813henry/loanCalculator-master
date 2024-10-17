@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Dimensions, StatusBar } from 'react-native';
+import { View, Text, Animated, Dimensions, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
 import { useTheme } from '../context/theme-context';
 import CalculationButton from '../components/button-option';
 import { 
@@ -12,6 +12,7 @@ import {
   PieChart 
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { auth } from '../../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
 
 const { width } = Dimensions.get('window');
 const buttonWidth = (width - 60) / 2; // 60 is the total horizontal padding (40) plus margins (20)
@@ -38,7 +39,16 @@ export default function HomeScreen({ navigation }) {
         useNativeDriver: true,
       })
     )).start();
-  });
+  }, []);
+
+  const handleLogout = () => {
+    auth.signOut()
+      .then(() => {
+        console.log("Usuario desconectado");
+        navigation.replace("Login"); // Redirigir a la pantalla de inicio de sesión
+      })
+      .catch(error => alert(error.message));
+  };
 
   return (
     <LinearGradient
@@ -46,39 +56,53 @@ export default function HomeScreen({ navigation }) {
       className="flex-1"
     >
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <View className="flex-1 justify-center items-center p-5">
-        <Text className="text-3xl font-bold text-center mb-8 font-nunito-bold text-gray-800 dark:text-gray-200">
-          Calculadora Financiera
-        </Text>
-        <Text className="text-lg text-center mb-8 font-nunito text-gray-600 dark:text-gray-400">
-          ¿Qué deseas calcular hoy?
-        </Text>
-        <View className="flex-row flex-wrap justify-between">
-          {calculationTypes.map((type, index) => (
-            <Animated.View 
-              key={index} 
-              style={{ 
-                width: buttonWidth, 
-                marginBottom: 20,
-                opacity: fadeAnims[index],
-                transform: [{
-                  translateY: fadeAnims[index].interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [50, 0]
-                  })
-                }]
-              }}
-            >
-              <CalculationButton
-                title={type.title}
-                colors={type.color}
-                onPress={() => type.screen && navigation.navigate(type.screen)}
-                icon={type.icon}
-                isDarkMode={isDarkMode}
-              />
-            </Animated.View>
-          ))}
-        </View>
+      <View className="flex-1 p-5">
+        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text className="text-3xl font-bold text-center mb-8 font-nunito-bold text-gray-800 dark:text-gray-200">
+            Calculadora Financiera
+          </Text>
+          <Text className="text-lg text-center mb-8 font-nunito text-gray-600 dark:text-gray-400">
+            ¿Qué deseas calcular hoy?
+          </Text>
+          <View className="flex-row flex-wrap justify-between">
+            {calculationTypes.map((type, index) => (
+              <Animated.View 
+                key={index} 
+                style={{ 
+                  width: buttonWidth, 
+                  marginBottom: 20,
+                  opacity: fadeAnims[index],
+                  transform: [{
+                    translateY: fadeAnims[index].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0]
+                    })
+                  }]
+                }}
+              >
+                <CalculationButton
+                  title={type.title}
+                  colors={type.color}
+                  onPress={() => type.screen && navigation.navigate(type.screen)}
+                  icon={type.icon}
+                  isDarkMode={isDarkMode}
+                />
+              </Animated.View>
+            ))}
+          </View>
+          <TouchableOpacity onPress={handleLogout} style={{
+              marginTop: 20,
+              backgroundColor: '#EF4444',
+              padding: 15,
+              borderRadius: 10,
+              alignItems: 'center',
+              width: '60%',
+            }}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+              Salir
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
     </LinearGradient>
   );

@@ -4,23 +4,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/theme-context';
 import { calculateUVR, formatDate } from '../utils/uvr';
 
-// Función para darle formato a los números con separador de miles y decimales
-const formatNumber = (number) => {
-  if (!number) return '';
-
-  // Convertimos el número en string con dos decimales
-  const formattedNumber = parseFloat(number).toFixed(2);
-
-  // Separamos la parte entera y decimal
-  const [integerPart, decimalPart] = formattedNumber.split('.');
-
-  // Formateamos la parte entera con separador de miles
-  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  // Retornamos el número con coma como separador decimal
-  return `${formattedInteger},${decimalPart}`;
-};
-
 export default function UVRScreen() {
   const { isDarkMode } = useTheme();
   const [lastUVR, setLastUVR] = useState('');
@@ -33,7 +16,7 @@ export default function UVRScreen() {
 
   const handleCalculate = () => {
     if (!lastUVR || !inflation) {
-      Alert.alert('Error', 'Por favor, rellene todos los campos');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -43,14 +26,7 @@ export default function UVRScreen() {
       startDate,
       endDate
     );
-
-    // Formatear los resultados de UVR antes de guardarlos
-    const formattedResults = calculatedResults.map(result => ({
-      ...result,
-      uvr: formatNumber(result.uvr), // Formatear el valor de UVR
-    }));
-
-    setResults(formattedResults);
+    setResults(calculatedResults);
   };
 
   const renderInput = (label, value, setValue, isDate = false) => (
@@ -80,19 +56,19 @@ export default function UVRScreen() {
     <ScrollView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
       <View className="p-4">
         <Text className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-          UVR Calculator
+          Unidad de Valor Real
         </Text>
-
-        {renderInput('Último UVR', lastUVR, setLastUVR)}
+        
+        {renderInput('Ultima UVR conocida', lastUVR, setLastUVR)}
         {renderInput('Inflación (%)', inflation, setInflation)}
-        {renderInput('Fecha de inicio', startDate, setStartDate, true)}
-        {renderInput('Fecha de finalización', endDate, setEndDate, true)}
+        {renderInput('Start Date', startDate, setStartDate, true)}
+        {renderInput('End Date', endDate, setEndDate, true)}
 
         <TouchableOpacity
           className={`p-4 rounded-md ${isDarkMode ? 'bg-blue-600' : 'bg-blue-500'}`}
           onPress={handleCalculate}
         >
-          <Text className="text-white text-center font-bold">Calcular</Text>
+          <Text className="text-white text-center font-bold">Calcular </Text>
         </TouchableOpacity>
 
         {results.length > 0 && (
